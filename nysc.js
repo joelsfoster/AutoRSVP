@@ -1,15 +1,9 @@
 const puppeteer = require('puppeteer');
 const moment = require('moment');
-// const cron = require('node-cron');
+const cron = require('node-cron');
 
 const nyscCredentials = require('./nyscCredentials.js');
 
-
-// Start the cron when this file is run
-// cron.schedule('* * * * *', () => { // TODO make this cron run immediately when a class' RSVPs are open
-//   console.log('running every minute');
-//   nysc();
-// });
 
 const nysc = async (desiredClass) => {
   try {
@@ -31,6 +25,7 @@ const nysc = async (desiredClass) => {
     await page.type('#username', nyscCredentials.username);
     await page.type('#password', nyscCredentials.password);
     await page.click('#_submit');
+    await page.waitForNavigation(); // give it time to login
 
     // Navigate to class page and filter your gym
     const targetDay = moment().add(7, 'days').format("MM/DD");
@@ -50,28 +45,27 @@ const nysc = async (desiredClass) => {
     // Get all the event rows then loop through each of them
     const events = await page.$$('#events-list > div.row');
     for (const e of events) {
-      const tryWrapper = async (func) => { try { return func } catch (err) { return null } };
 
-      const event = {
-        name:         await tryWrapper(e.$eval('a.bigger', eventName => eventName.innerText)),
-        duration:     await tryWrapper(e.$$eval('li.table-list-item', eventDuration => eventDuration[2].innerText)), // there are 3 lis, the third has what we want
-        instructor:   await tryWrapper(e.$eval('a.link', eventInstructor => eventInstructor.innerText)),
-        time:         await tryWrapper(e.$eval('span.big', eventTime => eventTime.innerText.substring(0,8).trim())), // Parses out the start time
-        room:         await tryWrapper(e.$eval('span.room', eventRoom => eventRoom.innerText.substring(2))), // removes unnecessary "@ " prefix in the string
-        address:      await tryWrapper(e.$eval('span.address', eventAddress => eventAddress.innerText)),
-        link:         await tryWrapper(e.$eval('a.reserve', eventLink => eventLink.href))
+
+      const event = { // commenting some out because some events don't have them and it messes with Puppeteer. Too lazy to account for right now.
+        name:         await e.$eval('a.bigger', name => name.innerText),
+        time:         await e.$eval('span.big', time => time.innerText.substring(0,8).trim()), // Parses out the start time
+        link:         await e.$eval('a.button', button => button.innerText == "RESERVE" ? button.href : null),
+        // duration:     await e.$$eval('li.table-list-item', duration => duration[2].innerText), // there are 3 lis, the third has what we want
+        // instructor:   await e.$eval('a.link', instructor => instructor.innerText),
+        // room:         await e.$eval('span.room', room => room.innerText.substring(2)), // removes unnecessary "@ " prefix in the string
+        // address:      await e.$eval('span.address', address => address.innerText)
       }
 
       console.log('\n');
-      console.log(event.name, `(${event.duration})`, 'with', event.instructor);
-      console.log(targetDay, '|', event.time);
-      console.log(event.room, '@', event.address);
+      console.log(event.name, '@', targetDay, event.time);
       console.log(event.link);
 
-      // Book the class if it's available
-      if (event.name == desiredClass.name && event.time == desiredClass.time) {
-        page.goto(event.link);
-        // TODO next, click "reserve"
+      // Book the class
+      if (event.name == desiredClass.name && event.time == desiredClass.time() && event.link) {
+        page.goto(event.link); // This reserves the class
+      } else {
+        console.log('Class not found, or is full or unavailable');
       }
     }
 
@@ -80,10 +74,40 @@ const nysc = async (desiredClass) => {
   }
 }
 
-// Run the function with the specified params
-const _desiredClass = { // TODO Let the user specify this
-  name: "Cycling",
-  time: "9:00 AM",
-  location: "astoria" // CASE SENSITIVE!!! words are separated by dashes
+
+// User-specified desired classes. All strings must be EXACT matches!!!
+const _desiredClasses = [
+  {
+    name: "Total Body Conditioning",
+    time: function() { return this.startHour + ":" + this.startMinute + ` ${this.amOrPm}` },
+    startHour: "10",
+    startMinute: "00",
+    amOrPm: "AM",
+    day: "Saturday",
+    location: "astoria" // CASE SENSITIVE!!! words are separated by dashes
+  },
+  {
+    name: "Cycling",
+    time: function() { return this.startHour + ":" + this.startMinute + ` ${this.amOrPm}` },
+    startHour: "9",
+    startMinute: "00",
+    amOrPm: "AM",
+    day: "Sunday",
+    location: "astoria" // CASE SENSITIVE!!! words are separated by dashes
+  }
+]
+
+
+// Start the crons when this file is run
+const startCrons = (desiredClasses) => {
+  desiredClasses.map(desiredClass => {
+
+    // Book each class 1 minute after it becomes available
+    cron.schedule(`${desiredClass.startMinute + 1} ${desiredClass.startHour} * * ${desiredClass.day}`, () => {
+      console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${desiredClass.time()}`);
+      nysc(desiredClass);
+    });
+  });
 }
-nysc(_desiredClass);
+
+startCrons(_desiredClasses);
