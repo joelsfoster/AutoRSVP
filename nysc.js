@@ -28,7 +28,7 @@ const nysc = async (desiredClass) => {
     await page.waitForNavigation(); // give it time to login
 
     // Navigate to class page and filter your gym
-    const targetDay = moment().add(7, 'days').format("MM/DD");
+    const targetDay = moment().add(7, 'days').format("MM/DD"); // Classes open up exactly a week ahead
     await page.goto(`https://www.newyorksportsclubs.com/classes?day=${targetDay}&club=${desiredClass.location}`);
 
     // Load all that there is to load (takes care of any pagination)
@@ -46,7 +46,6 @@ const nysc = async (desiredClass) => {
     const events = await page.$$('#events-list > div.row');
     for (const e of events) {
 
-
       const event = { // commenting some out because some events don't have them and it messes with Puppeteer. Too lazy to account for right now.
         name:         await e.$eval('a.bigger', name => name.innerText),
         time:         await e.$eval('span.big', time => time.innerText.substring(0,8).trim()), // Parses out the start time
@@ -57,13 +56,13 @@ const nysc = async (desiredClass) => {
         // address:      await e.$eval('span.address', address => address.innerText)
       }
 
-      console.log('\n');
-      console.log(event.name, '@', targetDay, event.time);
-      console.log(event.link);
+      // console.log('\n');
+      // console.log(event.name, '@', targetDay, event.time);
+      // console.log(event.link);
 
       // Book the class
       if (event.name == desiredClass.name && event.time == desiredClass.time() && event.link) {
-        page.goto(event.link); // This reserves the class
+        page.goto(event.link); // This reserves the class        
       } else {
         console.log('Class not found, or is full or unavailable');
       }
