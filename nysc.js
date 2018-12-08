@@ -109,9 +109,10 @@ const _desiredClasses = [
 // Start the crons when this file is run
 const startCrons = (desiredClasses) => {
   desiredClasses.map(desiredClass => {
+    const MINUTES_AFTER_OPENING = 1;
 
     // Book each class 1 minute after it becomes available
-    cron.schedule(`${desiredClass.startMinute + 1} ${desiredClass.startHour} * * ${desiredClass.day}`, () => {
+    cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_AFTER_OPENING).toString()} ${desiredClass.startHour} * * ${desiredClass.day}`, () => {
       console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${desiredClass.time()}`);
       nysc(desiredClass);
     });
