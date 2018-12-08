@@ -62,7 +62,7 @@ const nysc = async (desiredClass) => {
 
       // Book the class
       if (event.name == desiredClass.name && event.time == desiredClass.time() && event.link) {
-        page.goto(event.link); // This reserves the class        
+        page.goto(event.link); // This reserves the class
       } else {
         console.log('Class not found, or is full or unavailable');
       }
@@ -93,6 +93,15 @@ const _desiredClasses = [
     amOrPm: "AM",
     day: "Sunday",
     location: "astoria" // CASE SENSITIVE!!! words are separated by dashes
+  },
+  {
+    name: "Cycling",
+    time: function() { return this.startHour + ":" + this.startMinute + ` ${this.amOrPm}` },
+    startHour: "6",
+    startMinute: "30",
+    amOrPm: "AM",
+    day: "Tuesday",
+    location: "51st-lexington" // CASE SENSITIVE!!! words are separated by dashes
   }
 ]
 
