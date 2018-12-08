@@ -1,0 +1,25 @@
+{
+  "name": "autorsvp",
+  "version": "1.0.0",
+  "description": "Automatically RSVPs for you",
+  "main": "nysc.js",
+  "dependencies": {
+    "node-cron": "^2.0.3",
+    "moment": "^2.22.2",
+    "puppeteer": "^1.11.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joelsfoster/AutoRSVP.git"
+  },
+  "author": "Joel Foster",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joelsfoster/AutoRSVP/issues"
+  },
+  "homepage": "https://github.com/joelsfoster/AutoRSVP#readme"
+}
