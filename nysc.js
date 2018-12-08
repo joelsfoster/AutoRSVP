@@ -10,7 +10,7 @@ const nysc = async (desiredClass) => {
 
     // Initiate Puppeteer
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       defaultViewport: {
         width: 1400,
         height: 800
@@ -61,12 +61,21 @@ const nysc = async (desiredClass) => {
       // console.log(event.link);
 
       // Book the class
+      let bookingCompleted = false;
       if (event.name == desiredClass.name && event.time == desiredClass.time() && event.link) {
         page.goto(event.link); // This reserves the class
+        bookingCompleted = true;
       } else {
         console.log('Class not found, or is full or unavailable');
+        bookingCompleted = true;
+      }
+
+      while (bookingCompleted == true) {
+        browser.close();
       }
     }
+
+
 
   } catch (err) {
     console.log('*** ERROR ON OUR END ***:', err);
@@ -108,6 +117,8 @@ const _desiredClasses = [
 
 // Start the crons when this file is run
 const startCrons = (desiredClasses) => {
+
+  console.log("Starting up crons...");
   desiredClasses.map(desiredClass => {
     const MINUTES_AFTER_OPENING = 1;
 
