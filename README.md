@@ -5,9 +5,9 @@
 
 # To deploy updates:
 
-Stop processes
-`rm -rf AutoRSVP` from the /server folder
-`git clone https://github.com/joelsfoster/AutoRSVP.git`
-Go into the folder and `npm i`
-`nano nyscCredentials.js` and create a file that looks like: `module.exports { username: '', password: '' }`
-`node nysc.js`
+1. Stop processes
+2. `rm -rf AutoRSVP` from the /server folder
+3. `git clone https://github.com/joelsfoster/AutoRSVP.git`
+4. Go into the folder and `npm i`
+5. `nano nyscCredentials.js` and create a file that looks like: `module.exports { username: '', password: '' }`
+6. `node nysc.js`
