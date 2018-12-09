@@ -44,6 +44,7 @@ const nysc = async (desiredClass) => {
 
     // Get all the event rows then loop through each of them
     const events = await page.$$('#events-list > div.row');
+    let countOfEvents = 0;
     for (const e of events) {
 
       const event = { // commenting some out because some events don't have them and it messes with Puppeteer. Too lazy to account for right now.
@@ -56,26 +57,23 @@ const nysc = async (desiredClass) => {
         // address:      await e.$eval('span.address', address => address.innerText)
       }
 
-      // console.log('\n');
-      // console.log(event.name, '@', targetDay, event.time);
-      // console.log(event.link);
+      console.log('\n');
+      console.log(event.name, '@', targetDay, event.time);
+      console.log(event.link);
 
       // Book the class
-      let bookingCompleted = false;
       if (event.name == desiredClass.name && event.time == desiredClass.time() && event.link) {
         page.goto(event.link); // This reserves the class
-        bookingCompleted = true;
-      } else {
-        console.log('Class not found, or is full or unavailable');
-        bookingCompleted = true;
+        console.log(`Class booked! ${desiredClass.name} @ ${targetDay} ${desiredClass.time()}`)
+        await page.waitForNavigation();
       }
 
-      while (bookingCompleted == true) {
-        browser.close();
+      countOfEvents++;
+
+      if (countOfEvents == events.length) {
+        browser.close(); // Close the browser once we've looped through everything
       }
     }
-
-
 
   } catch (err) {
     console.log('*** ERROR ON OUR END ***:', err);
