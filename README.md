@@ -3,7 +3,7 @@
 `ssh -i ~/.ssh/AutoRSVP.pem ubuntu@ec2-52-55-7-111.compute-1.amazonaws.com`
 
 
-# To deploy updates:
+# To deploy updates and start the cron:
 
 1. Stop processes
 2. `rm -rf AutoRSVP` from the /server folder
@@ -38,4 +38,6 @@ module.exports = [
   }
 ]
 ```
-6. `node nysc.js`
+6. Use `tmux` to start a session where you run `node nysc.js`
+7. Use `ctrl+b` and then `d` to exit tmux, and safely exit SSH
+8. To re-enter the process, use `tmux attach`
