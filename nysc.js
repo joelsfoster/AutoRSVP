@@ -2,10 +2,10 @@ const puppeteer = require('puppeteer');
 const moment = require('moment');
 const cron = require('node-cron');
 
-const nyscCredentials = require('./nyscCredentials.js');
+const data = require('./data.js');
 
 
-const nysc = async (desiredClass) => {
+const nysc = async (username, password, desiredClass) => {
   try {
 
     // Initiate Puppeteer
@@ -22,8 +22,8 @@ const nysc = async (desiredClass) => {
     // Log in
     await page.goto('https://www.newyorksportsclubs.com/login');
     await page.waitForSelector('.login-form');
-    await page.type('#username', nyscCredentials.username);
-    await page.type('#password', nyscCredentials.password);
+    await page.type('#username', username);
+    await page.type('#password', password);
     await page.click('#_submit');
     await page.waitForNavigation(); // give it time to login
 
@@ -69,9 +69,8 @@ const nysc = async (desiredClass) => {
       }
 
       countOfEvents++;
-
       if (countOfEvents == events.length) {
-        browser.close(); // Close the browser once we've looped through everything
+        await browser.close(); // Close the browser once we've looped through everything
       }
     }
 
@@ -81,51 +80,26 @@ const nysc = async (desiredClass) => {
 }
 
 
-// User-specified desired classes. All strings must be EXACT matches!!!
-const _desiredClasses = [
-  {
-    name: "Total Body Conditioning",
-    time: function() { return this.startHour + ":" + this.startMinute + ` ${this.amOrPm}` },
-    startHour: "10",
-    startMinute: "00",
-    amOrPm: "AM",
-    day: "Saturday",
-    location: "astoria" // CASE SENSITIVE!!! words are separated by dashes
-  },
-  {
-    name: "Cycling",
-    time: function() { return this.startHour + ":" + this.startMinute + ` ${this.amOrPm}` },
-    startHour: "9",
-    startMinute: "00",
-    amOrPm: "AM",
-    day: "Sunday",
-    location: "astoria" // CASE SENSITIVE!!! words are separated by dashes
-  },
-  {
-    name: "Cycling",
-    time: function() { return this.startHour + ":" + this.startMinute + ` ${this.amOrPm}` },
-    startHour: "6",
-    startMinute: "30",
-    amOrPm: "AM",
-    day: "Tuesday",
-    location: "51st-lexington" // CASE SENSITIVE!!! words are separated by dashes
-  }
-]
-
 
 // Start the crons when this file is run
-const startCrons = (desiredClasses) => {
-
+const startCrons = (data) => {
   console.log("Starting up crons...");
-  desiredClasses.map(desiredClass => {
-    const MINUTES_AFTER_OPENING = 1;
+  const MINUTES_AFTER_OPENING = 1;
 
-    // Book each class 1 minute after it becomes available
-    cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_AFTER_OPENING).toString()} ${desiredClass.startHour} * * ${desiredClass.day}`, () => {
-      console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${desiredClass.time()}`);
-      nysc(desiredClass);
+  data.forEach( (user) => {
+    const username = user.username;
+    const password = user.password;
+    const desiredClasses = user.desiredClasses;
+
+    desiredClasses.forEach( (desiredClass) => {
+
+      // Book each class 1 minute after it becomes available
+      cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_AFTER_OPENING).toString()} ${desiredClass.startHour} * * ${desiredClass.day}`, () => {
+        console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${desiredClass.time()}`);
+        nysc(username, password, desiredClass);
+      });
     });
   });
 }
 
-startCrons(_desiredClasses);
+startCrons(data);
