@@ -64,10 +64,10 @@ const nysc = async (username, password, desiredClass) => {
 
       // Book the class
       if (event.name == desiredClass.name && event.time == desiredClass.time() && event.link) {
-        page.goto(event.link); // This reserves the class
+        const rsvpPage = await browser.newPage();
+        rsvpPage.goto(event.link); // This reserves the class in a new tab
         console.log(`Class booked! ${desiredClass.name} @ ${targetDay} ${desiredClass.time()}`)
-        await page.waitForNavigation();
-        await browser.close();
+        await rsvpPage.waitForNavigation();
       }
 
       countOfEvents++;
