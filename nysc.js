@@ -59,6 +59,7 @@ const nysc = async (username, password, desiredClass) => {
 
       console.log('\n');
       console.log(event.name, '@', targetDay, event.time);
+      console.log('Button:', await e.$eval('a.button', button => button.innerText));
       console.log(event.link);
 
       // Book the class
@@ -66,6 +67,7 @@ const nysc = async (username, password, desiredClass) => {
         page.goto(event.link); // This reserves the class
         console.log(`Class booked! ${desiredClass.name} @ ${targetDay} ${desiredClass.time()}`)
         await page.waitForNavigation();
+        await browser.close();
       }
 
       countOfEvents++;
@@ -76,6 +78,7 @@ const nysc = async (username, password, desiredClass) => {
 
   } catch (err) {
     console.log('*** ERROR ON OUR END ***:', err);
+    await browser.close();
   }
 }
 
@@ -84,7 +87,7 @@ const nysc = async (username, password, desiredClass) => {
 // Start the crons when this file is run
 const startCrons = (data) => {
   console.log("Starting up crons...");
-  const MINUTES_AFTER_OPENING = 1;
+  const MINUTES_AFTER_OPENING = 2;
 
   data.forEach( (user) => {
     const username = user.username;
