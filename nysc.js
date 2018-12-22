@@ -45,6 +45,7 @@ const nysc = async (username, password, desiredClass) => {
     // Get all the event rows then loop through each of them
     const events = await page.$$('#events-list > div.row');
     let countOfEvents = 0;
+    let eventBooked = false;
     for (const e of events) {
 
       const event = { // commenting some out because some events don't have them and it messes with Puppeteer. Too lazy to account for right now.
@@ -66,12 +67,15 @@ const nysc = async (username, password, desiredClass) => {
       if (event.name == desiredClass.name && event.time == desiredClass.time() && event.link) {
         const rsvpPage = await browser.newPage();
         rsvpPage.goto(event.link); // This reserves the class in a new tab
-        console.log(`Class booked! ${desiredClass.name} @ ${targetDay} ${desiredClass.time()}`)
+        eventBooked = true;
+        console.log(`Class booked! ${desiredClass.name} @ ${targetDay} ${desiredClass.time()}`);
         await rsvpPage.waitForNavigation();
       }
 
       countOfEvents++;
       if (countOfEvents == events.length) {
+        console.log('\n');
+        eventBooked == true ? console.log("SUCCESS: Event booked!") : console.log("FAILURE: Event wasn't booked");
         await browser.close(); // Close the browser once we've looped through everything
       }
     }
@@ -87,7 +91,7 @@ const nysc = async (username, password, desiredClass) => {
 // Start the crons when this file is run
 const startCrons = (data) => {
   console.log("Starting up crons...");
-  const MINUTES_AFTER_OPENING = 2;
+  const MINUTES_AFTER_OPENING = 15; // Must be less than 30
 
   data.forEach( (user) => {
     const username = user.username;
@@ -99,6 +103,7 @@ const startCrons = (data) => {
       // Book each class 1 minute after it becomes available
       cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_AFTER_OPENING).toString()} ${desiredClass.startHour} * * ${desiredClass.day}`, () => {
         console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${desiredClass.time()}`);
+        console.log(`The time now is ${moment().format("h:mm a, MM/DD")}`);
         nysc(username, password, desiredClass);
       });
     });
