@@ -91,7 +91,7 @@ const nysc = async (username, password, desiredClass) => {
 // Start the crons when this file is run
 const startCrons = (data) => {
   console.log("Starting up crons...");
-  const MINUTES_AFTER_OPENING = 15; // Must be less than 30
+  const MINUTES_AFTER_OPENING = 29; // Must be less than 30
 
   data.forEach( (user) => {
     const username = user.username;
