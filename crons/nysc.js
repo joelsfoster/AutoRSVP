@@ -2,9 +2,13 @@ const puppeteer = require('puppeteer');
 const moment = require('moment');
 const cron = require('node-cron');
 
-const data = require('./data.js');
 
+// Helpers
+const getEventTime = (desiredClass) => {
+  return desiredClass.startHour + ":" + desiredClass.startMinute + ` ${desiredClass.amOrPm}`
+}
 
+// Main function
 const nysc = async (username, password, desiredClass) => {
   try {
 
@@ -64,11 +68,11 @@ const nysc = async (username, password, desiredClass) => {
       console.log(event.link);
 
       // Book the class
-      if (event.name == desiredClass.name && event.time == desiredClass.time() && event.link) {
+      if (event.name == desiredClass.name && event.time == getEventTime(desiredClass) && event.link) {
         const rsvpPage = await browser.newPage();
         rsvpPage.goto(event.link); // This reserves the class in a new tab
         eventBooked = true;
-        console.log(`Class booked! ${desiredClass.name} @ ${targetDay} ${desiredClass.time()}`);
+        console.log(`Class booked! ${desiredClass.name} @ ${targetDay} ${getEventTime(desiredClass)}`);
         await rsvpPage.waitForNavigation();
       }
 
@@ -87,7 +91,6 @@ const nysc = async (username, password, desiredClass) => {
 }
 
 
-
 // Start the crons when this file is run
 const startCrons = (data) => {
   console.log("Starting up crons...");
@@ -102,7 +105,7 @@ const startCrons = (data) => {
 
       // Book each class 1 minute after it becomes available
       cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_AFTER_OPENING).toString()} ${desiredClass.startHour} * * ${desiredClass.day}`, () => {
-        console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${desiredClass.time()}`);
+        console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${getEventTime(desiredClass)}`);
         console.log(`The time now is ${moment().format("h:mm a, MM/DD")}`);
         nysc(username, password, desiredClass);
       });
@@ -110,4 +113,4 @@ const startCrons = (data) => {
   });
 }
 
-startCrons(data);
+module.exports = startCrons;
