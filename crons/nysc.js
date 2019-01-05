@@ -20,20 +20,20 @@ const nysc = async (username, password, desiredClass) => {
         height: 800
       }
      });
-    const page = await browser.newPage();
+    const context = await browser.createIncognitoBrowserContext();
+    const page = await context.newPage();
     page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Brave Chrome/70.0.3538.110 Safari/537.36');
 
     // Log in
-    await page.goto('https://www.newyorksportsclubs.com/login');
-    await page.waitForSelector('.login-form');
+    await page.goto('https://www.newyorksportsclubs.com/login', { waitUntil: "domcontentloaded" }); // Bypasses "free trial" modals
     await page.type('#username', username);
     await page.type('#password', password);
     await page.click('#_submit');
-    await page.waitForNavigation(); // give it time to login
+    await page.waitForNavigation({ waitUntil: "domcontentloaded" }); // give it time to login
 
     // Navigate to class page and filter your gym
     const targetDay = moment().add(7, 'days').format("MM/DD"); // Classes open up exactly a week ahead
-    await page.goto(`https://www.newyorksportsclubs.com/classes?day=${targetDay}&club=${desiredClass.location}`);
+    await page.goto(`https://www.newyorksportsclubs.com/classes?day=${targetDay}&club=${desiredClass.location}`, { waitUntil: "domcontentloaded" });
 
     // Load all that there is to load (takes care of any pagination)
     const loadMore = async () => {
@@ -79,7 +79,7 @@ const nysc = async (username, password, desiredClass) => {
       countOfEvents++;
       if (countOfEvents == events.length) {
         console.log('\n');
-        eventBooked == true ? console.log("SUCCESS: Event booked!") : console.log("FAILURE: Event wasn't booked");
+        eventBooked == true ? console.log(`SUCCESS: Event (${desiredClass.name} @ ${getEventTime(desiredClass)}) booked!`) : console.log(`FAILURE: Event (${desiredClass.name} @ ${getEventTime(desiredClass)}) wasn't booked`);
         await browser.close(); // Close the browser once we've looped through everything
       }
     }
@@ -94,7 +94,7 @@ const nysc = async (username, password, desiredClass) => {
 // Start the crons when this file is run
 const startCrons = (data) => {
   console.log("Starting up crons...");
-  const MINUTES_AFTER_OPENING = 29; // Must be less than 30
+  const MINUTES_AFTER_OPENING = 1; // Must be less than 30
 
   data.forEach( (user) => {
     const username = user.username;
@@ -105,9 +105,12 @@ const startCrons = (data) => {
 
       // Book each class 1 minute after it becomes available
       cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_AFTER_OPENING).toString()} ${desiredClass.startHour} * * ${desiredClass.day}`, () => {
+        console.log('\n');
         console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${getEventTime(desiredClass)}`);
         console.log(`The time now is ${moment().format("h:mm a, MM/DD")}`);
         nysc(username, password, desiredClass);
+        console.log('\n');
+        console.log('==========');
       });
     });
   });
