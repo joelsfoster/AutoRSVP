@@ -15,18 +15,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-// app.use(express.static(path.join(__dirname, 'public'))); // The boilerplate homepage
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(logger('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
-
-
-// React
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jsx');
-app.engine('jsx', require('express-react-views').createEngine());
-
 
 // Routes
 const indexRouter = require('./routes/index');
@@ -36,19 +29,16 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/v1/nyscData', nyscDataRouter);
 
-
 // Connect to the DB on MLab
 mongoose.connect('mongodb://admin:adminpass3@ds135983.mlab.com:35983/auto-rsvp', { useNewUrlParser: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
-  // we're connected! requires a callback
+  // we're connected!
 });
-
 
 // Export the app
 module.exports = app;
-
 
 // Start the crons
 NyscData.find( (err, nyscData) => {
