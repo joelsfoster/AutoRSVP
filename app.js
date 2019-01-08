@@ -6,10 +6,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const nyscDataRouter = require('./routes/nyscData');
-
 const startCrons = require('./crons/nysc');
 const NyscData = require('./models/NyscData'); // Previously got data from './data.js'
 
@@ -26,6 +22,9 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Routes
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const nyscDataRouter = require('./routes/nyscData');
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/v1/nyscData', nyscDataRouter);
