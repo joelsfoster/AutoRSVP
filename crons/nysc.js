@@ -20,8 +20,7 @@ const nysc = async (username, password, desiredClass) => {
         height: 800
       }
      });
-    const context = await browser.createIncognitoBrowserContext();
-    const page = await context.newPage();
+    const page = await browser.newPage();
     page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Brave Chrome/70.0.3538.110 Safari/537.36');
 
     // Log in
@@ -71,9 +70,9 @@ const nysc = async (username, password, desiredClass) => {
       if (event.name == desiredClass.name && event.time == getEventTime(desiredClass) && event.link) {
         const rsvpPage = await browser.newPage();
         rsvpPage.goto(event.link); // This reserves the class in a new tab
-        eventBooked = true;
         console.log(`Class booked! ${desiredClass.name} @ ${targetDay} ${getEventTime(desiredClass)}`);
         await rsvpPage.waitForNavigation();
+        eventBooked = true;
       }
 
       countOfEvents++;
@@ -103,7 +102,7 @@ const startCrons = (data) => {
 
     desiredClasses.forEach( (desiredClass) => {
 
-      // Book each class 1 minute after it becomes available
+      // Book each class n minutes after it becomes available
       cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_AFTER_OPENING).toString()} ${desiredClass.startHour} * * ${desiredClass.day}`, () => {
         console.log('\n');
         console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${getEventTime(desiredClass)}`);
