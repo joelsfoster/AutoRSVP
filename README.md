@@ -17,9 +17,10 @@ Public IP `http://35.173.81.110`
 3. `git clone https://github.com/joelsfoster/AutoRSVP.git`
 4. Go into the folder and `npm i`
 5. Ensure port forwarding is on from 80 to 3000: `sudo iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000`
-6. Use `tmux` to start a session where you run `npm start`
-7. Use `ctrl+b` and then `d` to exit tmux
-8. To re-enter the process, use `tmux attach`
+6. Ensure Ubuntu server time zone is in EST: `sudo timedatectl set-timezone EST` and correct dateTime is set: `sudo date MMDDHHmmYYYY.ss`
+7. Use `tmux` to start a session where you run `npm start`
+8. Use `ctrl+b` and then `d` to exit tmux
+9. To re-enter the process, use `tmux attach`
 
 
 # Roadmap / todos

@@ -93,7 +93,8 @@ const nysc = async (username, password, desiredClass) => {
 // Start the crons when this file is run
 const startCrons = (data) => {
   console.log("Starting up crons...");
-  const MINUTES_AFTER_OPENING = 29; // Must be less than 30
+  const HOURS_BEFORE_CLASSTIME = 1;
+  const MINUTES_BEFORE_CLASSTIME = 1;
 
   data.forEach( (user) => {
     const username = user.username;
@@ -103,7 +104,7 @@ const startCrons = (data) => {
     desiredClasses.forEach( (desiredClass) => {
 
       // Book each class n minutes after it becomes available
-      cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_AFTER_OPENING).toString()} ${desiredClass.startHour} * * ${desiredClass.day}`, () => {
+      cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_BEFORE_CLASSTIME).toString()} ${(Number(desiredClass.startHour) - HOURS_BEFORE_CLASSTIME).toString()} * * ${desiredClass.day}`, () => {
         console.log('\n');
         console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${getEventTime(desiredClass)}`);
         console.log(`The time now is ${moment().format("h:mm a, MM/DD")}`);
