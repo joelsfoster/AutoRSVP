@@ -20,7 +20,7 @@ Public IP `http://35.173.81.110`
 6. Ensure Ubuntu server time zone is in EST: `sudo timedatectl set-timezone EST` and correct dateTime is set: `sudo date MMDDHHmmYYYY.ss`
 7. Use `tmux` to start a session where you run `npm start`
 8. Use `ctrl+b` and then `d` to exit tmux
-9. To re-enter the process, use `tmux attach`
+9. To re-enter the process, use `tmux attach`, and use `control + b` then `[` to scroll
 
 
 # Roadmap / todos

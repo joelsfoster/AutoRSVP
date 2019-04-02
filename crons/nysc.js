@@ -93,8 +93,8 @@ const nysc = async (username, password, desiredClass) => {
 // Start the crons when this file is run
 const startCrons = (data) => {
   console.log("Starting up crons...");
-  const HOURS_BEFORE_CLASSTIME = 1;
-  const MINUTES_BEFORE_CLASSTIME = 1;
+  const HOURS_BEFORE_CLASSTIME = 2; // RSVPs open 1 week and 2 hours before
+  const MINUTES_OFFSET = 0;
 
   data.forEach( (user) => {
     const username = user.username;
@@ -104,7 +104,9 @@ const startCrons = (data) => {
     desiredClasses.forEach( (desiredClass) => {
 
       // Book each class n minutes after it becomes available
-      cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_BEFORE_CLASSTIME).toString()} ${(Number(desiredClass.startHour) - HOURS_BEFORE_CLASSTIME).toString()} * * ${desiredClass.day}`, () => {
+      cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_OFFSET).toString()} ${(Number(desiredClass.startHour) - HOURS_BEFORE_CLASSTIME).toString()} * * ${desiredClass.day}`, () => {
+        console.log('\n');
+        console.log('==========');
         console.log('\n');
         console.log(`Booking ${desiredClass.name} for next ${desiredClass.day} at ${getEventTime(desiredClass)}`);
         console.log(`The time now is ${moment().format("h:mm a, MM/DD")}`);
