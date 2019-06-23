@@ -1,8 +1,6 @@
 # To connect to remote server:
 
-`ssh -i ~/.ssh/AutoRSVP.pem ubuntu@ec2-35-173-81-110.compute-1.amazonaws.com`
-
-Public IP `http://35.173.81.110`
+`ssh -i ~/.ssh/AutoRSVP.pem ubuntu@ec2-3-90-190-42.compute-1.amazonaws.com`
 
 
 # Ubuntu dependencies:
