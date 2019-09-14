@@ -93,7 +93,7 @@ const nysc = async (username, password, desiredClass) => {
 // Start the crons when this file is run
 const startCrons = (data) => {
   console.log("Starting up crons...");
-  const HOURS_BEFORE_CLASSTIME = 3; // RSVPs open 1 week and 3 hours before
+  const HOURS_BEFORE_CLASSTIME = 2; // RSVPs open 1 week and 2 hours before
   const MINUTES_OFFSET = 0;
 
   data.forEach( (user) => {

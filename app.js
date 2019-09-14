@@ -7,8 +7,9 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 const startCrons = require('./crons/nysc');
-const NyscData = require('./models/NyscData'); // Previously got data from './data.js'
+const NyscData = require('./models/NyscData');
 const tools = require('./tools/index');
+
 
 // Middleware
 const app = express();
@@ -45,10 +46,11 @@ NyscData.find( async (err, nyscData) => {
   if (err) return console.error('ERROR STARTING CRON:\n' + err);
 
   // Uncomment these useful tools if needed
+  // const data = require('./data');
   // await tools.wipeData();
-  // const data = []; // Put this data below
   // await tools.seedData(data);
 
-  console.log('Starting crons for:\n' + nyscData);
+  console.log('\nStarting crons for:\n');
+  nyscData.forEach( (user) => { console.log(user.desiredClasses) });
   await startCrons(nyscData);
 });
