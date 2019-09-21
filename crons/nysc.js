@@ -103,8 +103,16 @@ const startCrons = (data) => {
 
     desiredClasses.forEach( (desiredClass) => {
 
+      const startHourConverter = (desiredClass) => {
+        if (desiredClass.amOrPm == "PM") {
+          return (Number(desiredClass.startHour) + 12);
+        } else {
+          return Number(desiredClass.startHour);
+        }
+      }
+
       // Book each class n minutes after it becomes available
-      cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_OFFSET).toString()} ${(Number(desiredClass.startHour) - HOURS_BEFORE_CLASSTIME).toString()} * * ${desiredClass.day}`, () => {
+      cron.schedule(`${(Number(desiredClass.startMinute) + MINUTES_OFFSET).toString()} ${(startHourConverter(desiredClass) - HOURS_BEFORE_CLASSTIME).toString()} * * ${desiredClass.day}`, () => {
         console.log('\n');
         console.log('==========');
         console.log('\n');
