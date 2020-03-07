@@ -1,6 +1,6 @@
 # To connect to remote server:
 
-`ssh -i ~/.ssh/AutoRSVP.pem ubuntu@ec2-52-91-55-145.compute-1.amazonaws.com`
+`ssh -i "AutoRSVP2.pem" ubuntu@ec2-54-145-201-238.compute-1.amazonaws.com`
 
 
 # Ubuntu dependencies:
@@ -15,7 +15,7 @@
 3. `git clone https://github.com/joelsfoster/AutoRSVP.git`
 4. Go into the folder and `npm i`
 5. Ensure port forwarding is on from 80 to 3000: `sudo iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000`
-6. Ensure Ubuntu server time zone is in EST: `sudo timedatectl set-timezone America/New_York` and correct dateTime is set: `sudo date -s 'YYYY-MM-DD HH:mm:ss'`
+6. Ensure Ubuntu server time zone is in EST: `sudo timedatectl set-timezone America/New_York` and correct dateTime is set: `sudo date -s`
 7. Install Chrome: if for some weird reason it's not working you might have to `npm i puppeteer` manually to get Chromium downloaded onto your machine
 8. Use `tmux` to start a session where you run `npm start`
 9. Use `ctrl+b` and then `d` to exit tmux

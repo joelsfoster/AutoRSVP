@@ -24,11 +24,11 @@ const nysc = async (username, password, desiredClass) => {
     page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Brave Chrome/70.0.3538.110 Safari/537.36');
 
     // Log in
-    await page.goto('https://www.newyorksportsclubs.com/login', { waitUntil: "domcontentloaded" }); // Bypasses "free trial" modals
+    await page.goto('https://www.newyorksportsclubs.com/login', { waitUntil: "domcontentloaded", timeout: 0 }); // Bypasses "free trial" modals
     await page.type('#username', username);
     await page.type('#password', password);
     await page.click('#_submit');
-    await page.waitForNavigation({ waitUntil: "domcontentloaded" }); // give it time to login
+    await page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 0 }); // give it time to login
 
     // Navigate to class page and filter your gym
     const targetDay = moment().add(7, 'days').format("MM/DD"); // Classes open up exactly a week ahead
